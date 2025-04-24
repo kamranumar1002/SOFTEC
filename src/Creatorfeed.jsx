@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import customFetch from "./interceptors/fetch";
 
 const CreatorFeed = () => {
   const [requests, setRequests] = useState([]);
   const [filter, setFilter] = useState("all");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/requests?creatorId=123")
+    if(localStorage.getItem('access_token') === null){                   
+      navigate('/login');
+    }else{
+    customFetch("/api/requests")
       .then(res => res.json())
       .then(data => setRequests(data));
+    }
   }, []);
 
   const filteredRequests = requests.filter(req =>

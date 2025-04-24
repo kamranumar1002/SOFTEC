@@ -1,8 +1,14 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, {useEffect} from "react";
+import { Link, useNavigate } from "react-router-dom";
 import ExploreCreators from "./ExploreCreators";
 
 const Clientfeed = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if(localStorage.getItem('access_token') === null){                   
+      navigate('/login');
+    }
+  }, [])
   return (
     <div className="client-feed-wrapper">
       <aside className="sidebar">

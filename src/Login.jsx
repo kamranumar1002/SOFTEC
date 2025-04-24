@@ -27,7 +27,7 @@ const Login = () => {
       };
       
       try {
-          const response = await fetch('backend_url/auth/token/', {
+          const response = await fetch('backend_url/api/auth/login/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

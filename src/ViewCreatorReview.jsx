@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import customFetch from "./interceptors/fetch";
 
 const ViewCreatorReview = () => {
   const [reviews, setReviews] = useState([]);
@@ -7,11 +8,7 @@ const ViewCreatorReview = () => {
   useEffect(() => {
     const fetchCreatorId = async () => {
       try {
-        const res = await fetch("/api/users/me", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-          },
-        });
+        const res = await customFetch("https://your-api-url.com/api/profile/me");
         const data = await res.json();
         setCreatorId(data.creatorId);
       } catch (err) {
@@ -27,7 +24,7 @@ const ViewCreatorReview = () => {
       if (!creatorId) return;
 
       try {
-        const res = await fetch(`https://your-api-url.com/api/creatorreview/${creatorId}`);
+        const res = await customFetch(`https://your-api-url.com/api/reviews/${creatorId}`);
         const data = await res.json();
         setReviews(data);
       } catch (err) {

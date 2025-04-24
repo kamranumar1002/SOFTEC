@@ -1,15 +1,21 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import customFetch from './interceptors/fetch';
 
 const Chat = () => {
   const { id } = useParams(); 
   const [messages, setMessages] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`/api/messages?chatId=${id}`) 
+    if(localStorage.getItem('access_token') === null){                   
+      navigate('/login');
+    }else{
+    customFetch(`/api/messages/${id}`) 
       .then(res => res.json())
       .then(data => setMessages(data));
+    }
   }, [id]);
 
   return (

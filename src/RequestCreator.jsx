@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import customFetch from "./interceptors/fetch";
 
 const RequestCreator = () => {
   const { creatorId } = useParams();
@@ -13,12 +14,7 @@ const RequestCreator = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch("/api/users/me", {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("jwtToken")}`, 
-          },
-        });
+        const response = await customFetch("https://your-api-url.com/api/profile/me");
         const userData = await response.json();
         setClientId(userData.clientId); 
       } catch (error) {
@@ -31,7 +27,7 @@ const RequestCreator = () => {
 
   // Fetch creator data
   useEffect(() => {
-    fetch(`https://your-api-url.com/api/creators/${creatorId}`)
+    customFetch(`https://your-api-url.com/api/creators/${creatorId}`)
       .then((res) => res.json())
       .then((data) => setCreator(data))
       .catch((err) => console.log("Error:", err));
@@ -57,9 +53,8 @@ const RequestCreator = () => {
     };
 
     try {
-      const res = await fetch("https://your-api-url.com/api/requests", {
+      const res = await customFetch("https://your-api-url.com/api/requests", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestPayload),
       });
 

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
+import customFetch from "./interceptors/fetch";
+import { useNavigate } from "react-router-dom";
 
 const ViewRequests = () => {
   const [tab, setTab] = useState("pending"); // Default tab
   const [requests, setRequests] = useState([]);
-  const clientId = "123"; // Replace with real auth logic
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`https://your-api.com/api/requests?clientId=${clientId}&status=${tab}`)
+    if(localStorage.getItem('access_token') === null){                   
+      navigate('/login');
+    }else{
+    customFetch(`https://your-api.com/api/requests/${localStorage.getItem("user_id")}/${tab}`)
       .then((res) => res.json())
       .then((data) => setRequests(data))
       .catch((err) => console.error("Error fetching requests:", err));
+    }
   }, [tab]);
 
   return (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import customFetch from "./interceptors/fetch";
 
 const Messages = () => {
   const [chats, setChats] = useState([]);
@@ -8,18 +9,22 @@ const Messages = () => {
 
   const userId = localStorage.getItem("userId"); 
 
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const response = await fetch(`/api/messages?userId=${userId}`);
-        const data = await response.json();
-        setChats(data);
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-      }
-    };
+  const fetchChats = async () => {
+    try {
+      const response = await customFetch(`https://your-api-url.com/api/messages`);
+      const data = await response.json();
+      setChats(data);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
+  };
 
-    fetchChats();
+  useEffect(() => {
+    if(localStorage.getItem('access_token') === null){                   
+        navigate('/login');
+    }else{
+      fetchChats();
+    }
   }, [userId]);
 
   return (

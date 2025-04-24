@@ -1,6 +1,6 @@
 import './App.css'
-import Home from './home'
-import {BrowserRouter as Router, Routes, Route, useLocation} from "react-router-dom";
+import Home from './Home'
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Login from './Login'
 import Signup from './Signup'
 import Clientfeed from './Clientfeed'
@@ -22,7 +22,7 @@ function App() {
     <>
     <Router>
       <Header />
-
+      <main>
       <Routes>
       <Route path='/' element={<Home/>}></Route>
       <Route path='/login' element={<Login/>}></Route>
@@ -38,8 +38,10 @@ function App() {
       <Route path='/catalogManager' element={<CatalogManager/>}></Route>
       <Route path='/creatorReview' element={<ViewCreatorReview/>}></Route>
       </Routes>
+      </main>
 
       <Footer />
+      
     </Router>
    
     </>

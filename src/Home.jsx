@@ -24,7 +24,6 @@ const Home = () => {
             alignItems: 'flex-start',
             textAlign: 'left',
             position: 'relative',
-            marginTop : "60px"
         }}
         >
         

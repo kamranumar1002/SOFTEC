@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+import customFetch from './interceptors/fetch';
 
 const CatalogManager = () => {
   const [catalogs, setCatalogs] = useState([]);
@@ -7,30 +9,30 @@ const CatalogManager = () => {
   const [description, setDescription] = useState("");
   const [thumbnailImage, setThumbnailImage] = useState("");
   const [creatorProfileId, setCreatorProfileId] = useState("");
+  const navigate = useNavigate();
+
+  const fetchCreatorData = async () => {
+    try {
+      const res = await customFetch("https://your-api-url.com/api/profile/me")
+      const data = await res.json();
+      setCreatorProfileId(data.creatorId);
+      fetchCatalogs(data.creatorId);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchCreatorData = async () => {
-      try {
-        const res = await fetch("/api/users/me", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-          },
-        });
-        const data = await res.json();
-        setCreatorProfileId(data.creatorId);
-        fetchCatalogs(data.creatorId);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-
+    if(localStorage.getItem('access_token') === null){                   
+        navigate('/login');
+    }else{
     fetchCreatorData();
+    }
   }, []);
 
   const fetchCatalogs = async (creatorId) => {
     try {
-      const res = await fetch(`https://your-api-url.com/api/catalog/${creatorId}`);
+      const res = await customFetch(`https://your-api-url.com/api/catalogues/creator/${creatorId}`);
       const data = await res.json();
       setCatalogs(data);
     } catch (error) {
@@ -43,9 +45,8 @@ const CatalogManager = () => {
     const payload = { creatorProfileId, profileType, cdnLink, description, thumbnailImage };
 
     try {
-      const res = await fetch("https://your-api-url.com/api/catalog", {
+      const res = await customFetch("https://your-api-url.com/api/catalogues", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -63,7 +64,7 @@ const CatalogManager = () => {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`https://your-api-url.com/api/catalog/${id}`, {
+      await customFetch(`https://your-api-url.com/api/catalogues/${id}`, {
         method: "DELETE",
       });
       setCatalogs(catalogs.filter((item) => item._id !== id));

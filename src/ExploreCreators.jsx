@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import customFetch from "./interceptors/fetch";
 
 const ExploreCreators = () => {
   const [catalogs, setCatalogs] = useState([]);
@@ -34,13 +35,13 @@ const ExploreCreators = () => {
 
 
   useEffect(() => {
-    fetch("https://your-api-url.com/api/catalogs") 
+    customFetch("https://your-api-url.com/api/creators") 
       .then((res) => res.json())
       .then((data) => {
         setCatalogs(data);
         setFilteredCatalogs(data);
       })
-      .catch((err) => console.log("Error fetching catalogs:", err));
+      .catch((err) => console.log("Error fetching creators:", err));
   }, []);
 
 

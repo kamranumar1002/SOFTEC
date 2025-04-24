@@ -49,20 +49,14 @@ const Signup = () => {
     formPayload.append("role", signupType);
   
     try {
-      const response = await fetch("backend_url/auth/token/", {
+      const response = await fetch("backend_url/api/auth/signup/", {
         method: "POST",
-        body: formPayload, // No headers needed, browser sets them
+        body: formPayload, 
       });
   
       if (!response.ok) throw new Error("Signup failed");
   
-      const data = await response.json();
-  
-      localStorage.clear();
-      localStorage.setItem("access_token", data.access);
-      localStorage.setItem("refresh_token", data.refresh);
-      localStorage.setItem("user_id", jwtDecode(data.access).user_id);
-  
+      alert("User registered successfully")
       navigate(signupType === "client" ? "/clientfeed" : "/creatorfeed");
     } catch (err) {
       console.error("Signup error:", err);
@@ -70,11 +64,11 @@ const Signup = () => {
   };
 
   return (
-      <div style={{ backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative', padding: 0, marginTop: "60px"}}
+      <div style={{ backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative', padding: 0 , paddingTop : signupType === "creator" ? "50px" : 0}}
           className="auth-container">
     
           <div className="blurred-overlay"
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backdropFilter: 'blur(3px)', backgroundColor: 'rgba(255, 255, 255, 0.2)', zIndex: 1,}}>              
+            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backdropFilter: 'blur(3px)', backgroundColor: 'rgba(255, 255, 255, 0.2)', zIndex: 1}}>              
           </div>
 
       <div style={{ position: 'relative', zIndex: 2 }} className="auth-box">
