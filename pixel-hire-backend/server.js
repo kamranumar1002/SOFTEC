@@ -14,6 +14,9 @@ const messageRoutes = require('./routes/messageRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const catalogueRoutes = require('./routes/catalogueRoutes');
+const creatorRoutes = require('./routes/creatorRoutes');
+
+
 
 dotenv.config();
 const app = express();
@@ -32,6 +35,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/catalogues', catalogueRoutes);
+app.use('/api/creators', creatorRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)

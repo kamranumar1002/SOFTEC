@@ -46,3 +46,21 @@ exports.deleteRequest = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.getAllRequests = async (req, res) => {
+  try {
+    const requests = await Request.find();
+    res.json(requests);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+exports.getRequestsByCreatorAndStatus = async (req, res) => {
+  try {
+    const { creatorId, status } = req.params;
+    const requests = await Request.find({ creator: creatorId, status });
+    res.json(requests);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
