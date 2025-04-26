@@ -47,9 +47,10 @@ const Signup = () => {
       }
     }
     formPayload.append("role", signupType);
-  
+    console.log("Form data being sent:", formPayload);
     try {
-      const response = await fetch("backend_url/api/auth/signup/", {
+      
+      const response = await fetch("http://localhost:5000/api/auth/signup/", {
         method: "POST",
         body: formPayload, 
       });

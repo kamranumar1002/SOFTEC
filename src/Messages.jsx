@@ -11,7 +11,7 @@ const Messages = () => {
 
   const fetchChats = async () => {
     try {
-      const response = await customFetch(`https://your-api-url.com/api/messages`);
+      const response = await customFetch(`http://localhost:5000/api/messages`);
       const data = await response.json();
       setChats(data);
     } catch (error) {

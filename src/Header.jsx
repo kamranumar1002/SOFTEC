@@ -1,10 +1,24 @@
-import React from 'react'
-import {useNavigate} from "react-router-dom"
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import logo from './assets/logo.png';
-
 
 const Header = () => {
     const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        // Check if the user is logged in by checking the presence of the access token
+        if (localStorage.getItem('access_token')) {
+            setIsLoggedIn(true);
+        }
+    }, []);
+
+    const handleLogout = () => {
+        // Clear localStorage and update the login state
+        localStorage.clear();
+        setIsLoggedIn(false);
+        navigate("/login"); // Redirect to the login page
+    };
 
     return (
         <nav
@@ -23,34 +37,36 @@ const Header = () => {
                 zIndex: 1000,
             }}
         >
-
             <img
-            className="logo-img"
-            src={logo}
-            alt="Logo"
-            onClick={() => navigate('/')}
+                className="logo-img"
+                src={logo}
+                alt="Logo"
+                onClick={() => navigate('/')}
             />
-        
 
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <button className="homebutton" onClick={() => navigate("/Aboutus")}>
-                About us
-            </button>
-            <button className="homebutton" onClick={() => navigate("/Contactus")}>
-                Contact us
-            </button>
-        
-            <button className="homebutton" onClick={() => navigate("/signup")}>
-                Join now
-            </button>
-        
-            <button className="homebutton" onClick={() => navigate("/login")}>
-                Log in
-            </button>
+                <button className="homebutton" onClick={() => navigate("/Aboutus")}>
+                    About us
+                </button>
+                <button className="homebutton" onClick={() => navigate("/Contactus")}>
+                    Contact us
+                </button>
+
+                {!isLoggedIn && (
+                    <button className="homebutton" onClick={() => navigate("/signup")}>
+                        Join now
+                    </button>
+                )}
+
+                <button
+                    className="homebutton"
+                    onClick={isLoggedIn ? handleLogout : () => navigate("/login")}
+                >
+                    {isLoggedIn ? "Log out" : "Log in"}
+                </button>
             </div>
         </nav>
-      
-    )
-}
+    );
+};
 
-export default Header
+export default Header;

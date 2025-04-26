@@ -8,7 +8,7 @@ const ViewCreatorReview = () => {
   useEffect(() => {
     const fetchCreatorId = async () => {
       try {
-        const res = await customFetch("https://your-api-url.com/api/profile/me");
+        const res = await customFetch("http://localhost:5000/api/profile/me");
         const data = await res.json();
         setCreatorId(data.creatorId);
       } catch (err) {
@@ -24,7 +24,7 @@ const ViewCreatorReview = () => {
       if (!creatorId) return;
 
       try {
-        const res = await customFetch(`https://your-api-url.com/api/reviews/${creatorId}`);
+        const res = await customFetch(`http://localhost:5000/api/reviews/${creatorId}`);
         const data = await res.json();
         setReviews(data);
       } catch (err) {

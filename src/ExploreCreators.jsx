@@ -1,121 +1,114 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import customFetch from "./interceptors/fetch";
 
 const ExploreCreators = () => {
   const [catalogs, setCatalogs] = useState([]);
-  const [filteredCatalogs, setFilteredCatalogs] = useState([]);
-  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
   const [clientCity, setClientCity] = useState("");
-
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(async (position) => {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
+    const fetchData = async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
+      try {
+        // Get user location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const { latitude, longitude } = position.coords;
+              const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+              );
+              const data = await res.json();
+              const city =
+                data.address.city ||
+                data.address.town ||
+                data.address.village ||
+                "Unknown";
+              setClientCity(city);
+            },
+            (error) => {
+              console.error("Geolocation error:", error);
+              setClientCity("Unknown");
+            }
           );
-          const data = await res.json();
-          const city =
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            "";
-          setClientCity(city);
-        } catch (error) {
-          console.log("Error getting location:", error);
         }
-      });
-    }
-  }, []);
 
-
-  useEffect(() => {
-    customFetch("https://your-api-url.com/api/creators") 
-      .then((res) => res.json())
-      .then((data) => {
+        // Fetch creator data
+        const res = await customFetch("http://localhost:5000/api/creators");
+        if (!res.ok) throw new Error("Unauthorized");
+        const data = await res.json();
         setCatalogs(data);
-        setFilteredCatalogs(data);
-      })
-      .catch((err) => console.log("Error fetching creators:", err));
-  }, []);
+      } catch (error) {
+        console.error("Error fetching creators:", error.message);
+        navigate("/login");
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchData();
+  }, [navigate]);
 
-  useEffect(() => {
-    const searchText = search.toLowerCase();
-
-    const filtered = catalogs.filter((catalog) => {
-      const matchCity = clientCity
-        ? catalog.creatorLocation?.toLowerCase().includes(clientCity.toLowerCase())
-        : true;
-
-      const matchSearch =
-        catalog.profileType.toLowerCase().includes(searchText) ||
-        catalog.description.toLowerCase().includes(searchText);
-
-      return searchText ? matchSearch : matchCity;
-    });
-
-    setFilteredCatalogs(filtered);
-  }, [search, clientCity, catalogs]);
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Explore Professionals Nearby</h2>
-      <p style={{ color: "gray" }}>
-        Showing results near: <strong>{clientCity || "your area"}</strong>
-      </p>
-
-      <input
-        type="text"
-        placeholder="Search by profile type or description"
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={{ width: "100%", padding: "8px", margin: "10px 0" }}
-      />
-
+      <h2>Explore Creators in {clientCity}</h2>
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "16px",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gap: "20px",
+          marginTop: "20px",
         }}
       >
-        {filteredCatalogs.length > 0 ? (
-          filteredCatalogs.map((catalog) => (
+        {catalogs.length > 0 ? (
+          catalogs.map((creator) => (
             <div
-              key={catalog._id}
+              key={creator._id}
               style={{
-                border: "1px solid #ccc",
-                padding: "16px",
+                border: "1px solid #ddd",
                 borderRadius: "8px",
+                padding: "16px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                backgroundColor: "#fff",
               }}
             >
-              <img
-                src={catalog.thumbnail || "https://via.placeholder.com/250x150"}
-                alt="Catalog Thumbnail"
+              <h3 style={{ margin: "0 0 10px" }}>
+                {creator.fname} {creator.lname}
+              </h3>
+              <p style={{ margin: "0 0 8px", color: "#555" }}>
+                📍 {creator.creatorLocation}
+              </p>
+              <p style={{ margin: "0 0 8px", color: "#777" }}>
+                ✉️ {creator.email}
+              </p>
+              <button
                 style={{
-                  width: "100%",
-                  height: "150px",
-                  objectFit: "cover",
+                  padding: "10px 16px",
+                  backgroundColor: "#007bff",
+                  color: "#fff",
+                  border: "none",
                   borderRadius: "4px",
+                  cursor: "pointer",
                 }}
-              />
-              <h3>{catalog.profileType}</h3>
-              <p>{catalog.description}</p>
-              <p>📍 {catalog.creatorLocation}</p>
-
-              <Link to={`/requestCreator/${catalog.creatorId}`}>
-                <button style={{ marginTop: "8px" }}>Book Now</button>
-              </Link>
+                onClick={() => alert(`Contacting ${creator.fname}...`)}
+              >
+                Contact
+              </button>
             </div>
           ))
         ) : (
-          <p>No professionals found.</p>
+          <p style={{ gridColumn: "1 / -1", textAlign: "center", color: "#777" }}>
+            No creators found.
+          </p>
         )}
       </div>
     </div>

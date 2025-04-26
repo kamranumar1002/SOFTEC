@@ -14,7 +14,7 @@ const RequestCreator = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await customFetch("https://your-api-url.com/api/profile/me");
+        const response = await customFetch("http://localhost:5000/api/profile/me");
         const userData = await response.json();
         setClientId(userData.clientId); 
       } catch (error) {
@@ -27,7 +27,7 @@ const RequestCreator = () => {
 
   // Fetch creator data
   useEffect(() => {
-    customFetch(`https://your-api-url.com/api/creators/${creatorId}`)
+    customFetch(`http://localhost:5000/api/creators/${creatorId}`)
       .then((res) => res.json())
       .then((data) => setCreator(data))
       .catch((err) => console.log("Error:", err));
@@ -53,7 +53,7 @@ const RequestCreator = () => {
     };
 
     try {
-      const res = await customFetch("https://your-api-url.com/api/requests", {
+      const res = await customFetch("http://localhost:5000/api/requests", {
         method: "POST",
         body: JSON.stringify(requestPayload),
       });

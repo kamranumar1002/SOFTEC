@@ -13,7 +13,7 @@ const CatalogManager = () => {
 
   const fetchCreatorData = async () => {
     try {
-      const res = await customFetch("https://your-api-url.com/api/profile/me")
+      const res = await customFetch("http://localhost:5000/api/profile/me")
       const data = await res.json();
       setCreatorProfileId(data.creatorId);
       fetchCatalogs(data.creatorId);
@@ -32,7 +32,7 @@ const CatalogManager = () => {
 
   const fetchCatalogs = async (creatorId) => {
     try {
-      const res = await customFetch(`https://your-api-url.com/api/catalogues/creator/${creatorId}`);
+      const res = await customFetch(`http://localhost:5000/api/catalogues/creator/${creatorId}`);
       const data = await res.json();
       setCatalogs(data);
     } catch (error) {
@@ -45,7 +45,7 @@ const CatalogManager = () => {
     const payload = { creatorProfileId, profileType, cdnLink, description, thumbnailImage };
 
     try {
-      const res = await customFetch("https://your-api-url.com/api/catalogues", {
+      const res = await customFetch("http://localhost:5000/api/catalogues", {
         method: "POST",
         body: JSON.stringify(payload),
       });
@@ -64,7 +64,7 @@ const CatalogManager = () => {
 
   const handleDelete = async (id) => {
     try {
-      await customFetch(`https://your-api-url.com/api/catalogues/${id}`, {
+      await customFetch(`http://localhost:5000/api/catalogues/${id}`, {
         method: "DELETE",
       });
       setCatalogs(catalogs.filter((item) => item._id !== id));

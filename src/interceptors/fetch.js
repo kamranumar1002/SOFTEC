@@ -1,73 +1,39 @@
-const customFetch = async (url, { method = 'GET', body = null, headers = {}, ...options } = {}) => {
-  let refresh = false;
-  let response;
+const customFetch = async (url, options = {}) => {
+  const accessToken = localStorage.getItem("access_token");
+  const refreshToken = localStorage.getItem("refresh_token");
 
-  const token = localStorage.getItem('access_token');
-
-  // Don't set Content-Type if body is FormData
-  const mergedHeaders = {
-    'Authorization': `Bearer ${token}`,
-    ...headers,
-  };
-
-  // Remove Content-Type if body is FormData
-  if (!(body instanceof FormData)) {
-    mergedHeaders['Content-Type'] = 'application/json';
+  const headers = options.headers || {};
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
   }
 
-  const fetchOptions = {
-    method,
-    headers: mergedHeaders,
-    body: body && !(body instanceof FormData) ? JSON.stringify(body) : body,
+  const finalOptions = {
     ...options,
+    headers,
   };
 
-  // Make the fetch request
-  response = await fetch(url, fetchOptions);
+  let response = await fetch(url, finalOptions);
 
-  if (response.status === 401 && !refresh) {
-    refresh = true;
-
-    const refreshToken = localStorage.getItem('refresh_token');
-
-    const refreshResponse = await fetch('https://your-api-url.com/auth/token/refresh/', {
-      method: 'POST',
+  if (response.status === 401 && refreshToken) {
+    const refreshResponse = await fetch("http://localhost:5000/api/auth/refreshToken", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        refresh: refreshToken,
-      }),
+      body: JSON.stringify({ token: refreshToken }),
     });
-
-    if (refreshResponse.status === 401){
-      localStorage.clear();
-      window.location.href = "/login"
-    }
 
     if (refreshResponse.ok) {
       const data = await refreshResponse.json();
+      localStorage.setItem("access_token", data.token);
 
-      // Store new tokens in local storage
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
-
-      // Update the Authorization header with the new token
-      fetchOptions.headers['Authorization'] = `Bearer ${data.access}`;
-
-      // Retry the original request with the new token
-      response = await fetch(url, fetchOptions);
+      finalOptions.headers.Authorization = `Bearer ${data.token}`;
+      response = await fetch(url, finalOptions);
     } else {
-      console.error('Failed to refresh token');
-      throw new Error('Failed to refresh token');
+      localStorage.clear();
+      window.location.href = "/login";
+      throw new Error("Token refresh failed");
     }
-  }
-
-  refresh = false;
-
-  // Handle errors if needed
-  if (!response.ok) {
-    console.error('Fetch error:', response.statusText);
   }
 
   return response;
