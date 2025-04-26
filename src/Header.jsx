@@ -48,9 +48,6 @@ const Header = () => {
                 <button className="homebutton" onClick={() => navigate("/Aboutus")}>
                     About us
                 </button>
-                <button className="homebutton" onClick={() => navigate("/Contactus")}>
-                    Contact us
-                </button>
 
                 {!isLoggedIn && (
                     <button className="homebutton" onClick={() => navigate("/signup")}>

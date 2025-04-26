@@ -15,6 +15,7 @@ import AboutUs from './AboutUs'
 import ContactUs from './ContactUs'
 import Header from './Header';
 import Footer from './Footer';
+import ClientProfile from './ClientProfile';
 
 function App() {
   
@@ -37,6 +38,7 @@ function App() {
       <Route path='/requests' element={<ViewRequests/>}></Route>
       <Route path='/catalogManager' element={<CatalogManager/>}></Route>
       <Route path='/creatorReview' element={<ViewCreatorReview/>}></Route>
+      <Route path='/client-profile/:id' element={<ClientProfile/>}></Route>
       </Routes>
       </main>
 

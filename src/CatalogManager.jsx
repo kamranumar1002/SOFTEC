@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import customFetch from './interceptors/fetch';
+import { useNavigate } from "react-router-dom";
+import customFetch from "./interceptors/fetch";
 
 const CatalogManager = () => {
   const [catalogs, setCatalogs] = useState([]);
@@ -13,30 +13,38 @@ const CatalogManager = () => {
 
   const fetchCreatorData = async () => {
     try {
-      const res = await customFetch("http://localhost:5000/api/profile/me")
+      const res = await customFetch("http://localhost:5000/api/profile/me");
+      if (!res.ok) {
+        throw new Error("Failed to fetch creator data");
+      }
       const data = await res.json();
       setCreatorProfileId(data.creatorId);
       fetchCatalogs(data.creatorId);
     } catch (error) {
-      console.error("Error fetching user:", error);
+      console.error("Error fetching creator data:", error);
+      navigate("/login");
     }
   };
 
   useEffect(() => {
-    if(localStorage.getItem('access_token') === null){                   
-        navigate('/login');
-    }else{
-    fetchCreatorData();
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      navigate("/login");
+    } else {
+      fetchCreatorData();
     }
-  }, []);
+  }, [navigate]);
 
   const fetchCatalogs = async (creatorId) => {
     try {
       const res = await customFetch(`http://localhost:5000/api/catalogues/creator/${creatorId}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch catalogs");
+      }
       const data = await res.json();
       setCatalogs(data);
     } catch (error) {
-      console.error("Error fetching catalog:", error);
+      console.error("Error fetching catalogs:", error);
     }
   };
 
@@ -47,8 +55,15 @@ const CatalogManager = () => {
     try {
       const res = await customFetch("http://localhost:5000/api/catalogues", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(payload),
       });
+
+      if (!res.ok) {
+        throw new Error("Failed to upload catalog");
+      }
 
       const data = await res.json();
       alert("Catalog uploaded successfully!");
@@ -64,9 +79,14 @@ const CatalogManager = () => {
 
   const handleDelete = async (id) => {
     try {
-      await customFetch(`http://localhost:5000/api/catalogues/${id}`, {
+      const res = await customFetch(`http://localhost:5000/api/catalogues/${id}`, {
         method: "DELETE",
       });
+
+      if (!res.ok) {
+        throw new Error("Failed to delete catalog");
+      }
+
       setCatalogs(catalogs.filter((item) => item._id !== id));
     } catch (err) {
       console.error("Delete failed:", err);
