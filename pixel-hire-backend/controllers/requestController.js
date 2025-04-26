@@ -36,7 +36,8 @@ exports.deleteRequest = async (req, res) => {
     const request = await Request.findById(requestId);
     if (!request) return res.status(404).json({ message: 'Request not found' });
 
-    if (request.client.toString() !== req.user._id) {
+    // Ensure both values are strings before comparing
+    if (request.client.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized to delete this request' });
     }
 
@@ -55,10 +56,11 @@ exports.getAllRequests = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-exports.getRequestsByCreatorAndStatus = async (req, res) => {
+
+exports.getRequestsByCreator = async (req, res) => {
   try {
-    const { creatorId, status } = req.params;
-    const requests = await Request.find({ creator: creatorId, status });
+    const { creatorId } = req.params;
+    const requests = await Request.find({ creator: creatorId });
     res.json(requests);
   } catch (err) {
     res.status(500).json({ message: err.message });

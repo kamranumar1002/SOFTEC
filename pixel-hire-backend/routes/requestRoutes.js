@@ -4,7 +4,7 @@ const { protect } = require('../middlewares/authMiddleware');
 const { onlyClients, onlyCreators } = require('../middlewares/roleCheck');
 const { deleteRequest } = require('../controllers/requestController');
 const { getAllRequests } = require('../controllers/requestController');
-const { getRequestsByCreatorAndStatus } = require('../controllers/requestController');
+const { getRequestsByCreator } = require('../controllers/requestController');
 
 
 
@@ -16,4 +16,4 @@ router.get('/', protect, onlyCreators, getAllOpenRequests); // Creators see open
 router.delete('/:requestId', protect, onlyClients, deleteRequest);
 module.exports = router;
 router.get('/', protect, getAllRequests);
-router.get('/:creatorId/:status', protect, getRequestsByCreatorAndStatus);
+router.get('/:creatorId', protect, getRequestsByCreator);

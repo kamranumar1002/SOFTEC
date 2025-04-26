@@ -1,15 +1,16 @@
 const express = require('express');
-const { leaveReview, getReviewsForUser } = require('../controllers/reviewController');
+const { leaveReview, getReviewsForUser, deleteReview } = require('../controllers/reviewController');
 const { protect } = require('../middlewares/authMiddleware');
-
-const { deleteReview } = require('../controllers/reviewController');
-
-
 
 const router = express.Router();
 
+// Leave a review (protected)
 router.post('/', protect, leaveReview);
-router.get('/:userId', protect, getReviewsForUser);
+
+// Get all reviews for a user (public)
+router.get('/:userId', getReviewsForUser);
+
+// Delete a review (protected)
 router.delete('/:reviewId', protect, deleteReview);
 
 module.exports = router;
