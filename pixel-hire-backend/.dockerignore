@@ -1,0 +1,12 @@
+# Don't include local dependencies
+node_modules
+
+# Don't include sensitive environment variables
+.env
+
+# Ignore system and build files
+npm-debug.log
+Dockerfile
+.dockerignore
+.git
+.gitignore

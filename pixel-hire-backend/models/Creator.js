@@ -16,7 +16,8 @@ const creatorSchema = new mongoose.Schema({
   username: { type: String, unique: true },
   password: String,
   rating: Number,
-  bio: String
+  bio: String,
+  creatorLocation: {type: String, required: true, default: "Lahore"},
 }, { timestamps: true });
 
 creatorSchema.pre('save', async function (next) {

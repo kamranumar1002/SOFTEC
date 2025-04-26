@@ -4,7 +4,10 @@ const generateToken = require('../utils/generateToken');
 const jwt = require('jsonwebtoken');
 
 exports.signup = async (req, res) => {
+  console.log(req);
+  
   const { role, ...rest } = req.body;
+  
 
   try {
     let user;
