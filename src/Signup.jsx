@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode";
 import bg from './assets/form-bg.jpg';
 
 const Signup = () => {
@@ -8,19 +7,18 @@ const Signup = () => {
 
   const [signupType, setSignupType] = useState("client");
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    fname: "",
+    lname: "",
     email: "",
-    phone: "",
+    phone_no: "",
     cnic: "",
     username: "",
     password: "",
-    portfolioUrl: "",
-    cameraGear: "",
-    profileType: "",
-    budgetRange: "",
+    camera_gear_desc: "",
+    profile_type: "",
+    budget_range: "",
     bio: "",
-    profileImage: null,
+    profile_img: null,
   });
 
   useEffect(() => {
@@ -40,29 +38,59 @@ const Signup = () => {
   const signupUser = async (e) => {
     e.preventDefault();
   
-    const formPayload = new FormData();
-    for (const key in formData) {
-      if (formData[key]) {
-        formPayload.append(key, formData[key]);
-      }
-    }
-    formPayload.append("role", signupType);
-    console.log("Form data being sent:", formPayload);
     try {
-      
+      let profileImgURL = "";
+  
+      // 1. If user selected an image, upload it to CDN first
+      if (formData.profile_img) {
+        const imageFormData = new FormData();
+        imageFormData.append("file", formData.profile_img);
+        imageFormData.append("cloud_name", "dp4k97bhg"); // optional depending on CDN
+        imageFormData.append("upload_preset", "unsigned");
+  
+        const imgUploadRes = await fetch("https://api.cloudinary.com/v1_1/dp4k97bhg/image/upload", {
+          method: "POST",
+          body: imageFormData,
+        });
+  
+        const imgData = await imgUploadRes.json();
+        profileImgURL = imgData.secure_url; // <-- get CDN URL
+      }
+  
+      // 2. Now prepare final data to send
+      const finalPayload = new FormData();
+      for (const key in formData) {
+        if (key === "profile_img") {
+          if (profileImgURL) {
+            finalPayload.append("profile_img", profileImgURL);
+          }
+        } else if (formData[key]) {
+          finalPayload.append(key, formData[key]);
+        }
+      }
+      finalPayload.append("role", signupType);
+  
+      // 3. Debug: see what is being sent
+      for (let [key, value] of finalPayload.entries()) {
+        console.log(key, value);
+      }
+  
+      // 4. Send signup request
       const response = await fetch("http://localhost:5000/api/auth/signup/", {
         method: "POST",
-        body: formPayload, 
+        body: finalPayload,
       });
   
       if (!response.ok) throw new Error("Signup failed");
   
-      alert("User registered successfully")
+      alert("User registered successfully");
       navigate(signupType === "client" ? "/clientfeed" : "/creatorfeed");
+  
     } catch (err) {
       console.error("Signup error:", err);
     }
   };
+  
 
   return (
       <div style={{ backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative', padding: 0 , paddingTop : signupType === "creator" ? "50px" : 0}}
@@ -75,23 +103,22 @@ const Signup = () => {
       <div style={{ position: 'relative', zIndex: 2 }} className="auth-box">
         <h2>SIGN UP AS A {signupType.toUpperCase()}</h2>
         <form className="signup-form" onSubmit={signupUser}>
-          <input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First Name" required />
-          <input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last Name" required />
+          <input name="fname" value={formData.fname} onChange={handleChange} placeholder="First Name" required />
+          <input name="lname" value={formData.lname} onChange={handleChange} placeholder="Last Name" required />
           <input name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Email Address" required />
-          <input name="phone" type="tel" value={formData.phone} onChange={handleChange} placeholder="Phone Number" required />
+          <input name="phone_no" type="tel" value={formData.phone_no} onChange={handleChange} placeholder="Phone Number" required />
           <input name="cnic" value={formData.cnic} onChange={handleChange} placeholder="CNIC" required />
           <input name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
           <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
 
           {signupType === "creator" && (
             <>
-              <input name="portfolioUrl" value={formData.portfolioUrl} onChange={handleChange} placeholder="Linktree or Portfolio URL" />
-              <input name="cameraGear" value={formData.cameraGear} onChange={handleChange} placeholder="Camera Gear Description" />
-              <input name="profileType" value={formData.profileType} onChange={handleChange} placeholder="Profile Type" />
-              <input name="budgetRange" value={formData.budgetRange} onChange={handleChange} placeholder="Budget Range" />
+              <input name="camera_gear_desc" value={formData.camera_gear_desc} onChange={handleChange} placeholder="Camera Gear Description" />
+              <input name="profile_type" value={formData.profile_type} onChange={handleChange} placeholder="Profile Type" />
+              <input name="budget_range" value={formData.budget_range} onChange={handleChange} placeholder="Budget Range" />
               <div>
                 <label style={{border:"None"}}>Profile Image</label>
-                <input style={{marginTop:"5px"}} name="profileImage" type="file" accept="image/*" onChange={handleChange} />
+                <input style={{marginTop:"5px"}} name="profile_img" type="file" accept="image/*" onChange={handleChange} />
               </div>
               <textarea name="bio" rows="2" value={formData.bio} onChange={handleChange} placeholder="Bio" />
               

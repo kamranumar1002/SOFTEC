@@ -11,7 +11,8 @@ const CreatorFeed = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (localStorage.getItem("access_token") === null) {
+    const role = localStorage.getItem("role");
+    if (localStorage.getItem("access_token") === null || role !== "creator") {
       navigate("/login");
     } else {
       customFetch(`http://localhost:5000/api/requests`)

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import customFetch from "./interceptors/fetch";
 import { useNavigate } from "react-router-dom";
+import ClientSidebar from "./ClientSidebar";
 
 const ViewRequests = () => {
-  const [tab, setTab] = useState("pending"); // Default tab
+  const [tab, setTab] = useState("Pending"); // Default tab
   const [requests, setRequests] = useState([]);
   const navigate = useNavigate();
 
@@ -19,10 +20,12 @@ const ViewRequests = () => {
   }, [tab]);
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div className="client-feed-wrapper">
+    <ClientSidebar />
+    <div style={{ padding: "20px", marginLeft: "5vw", marginTop: "5vh", width: "80vw" }}>
       <h2>My Booking Requests</h2>
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        {["upcoming", "past", "pending"].map((type) => (
+        {["Pending", "Completed"].map((type) => (
           <button
             key={type}
             onClick={() => setTab(type)}
@@ -51,6 +54,7 @@ const ViewRequests = () => {
           ))}
         </ul>
       )}
+    </div>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import customFetch from "./interceptors/fetch";
+import ClientSidebar from "./ClientSidebar";
 
 const Messages = () => {
   const [chats, setChats] = useState([]);
@@ -20,7 +21,7 @@ const Messages = () => {
   };
 
   useEffect(() => {
-    if(localStorage.getItem('access_token') === null){                   
+    if(localStorage.getItem('access_token') !== null){                   
         navigate('/login');
     }else{
       fetchChats();
@@ -28,6 +29,8 @@ const Messages = () => {
   }, [userId]);
 
   return (
+  <div className="client-feed-wrapper">
+  <ClientSidebar />
     <div className="messages-page">
       <h2>Your Messages</h2>
 
@@ -45,6 +48,7 @@ const Messages = () => {
           </div>
         ))
       )}
+      </div>
     </div>
   );
 };

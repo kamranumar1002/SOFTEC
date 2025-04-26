@@ -41,8 +41,10 @@ const Login = () => {
       console.log(data);
 
       localStorage.clear();
-      localStorage.setItem("access_token", data?.token);
-      localStorage.setItem("role", loginType);
+      localStorage.setItem('access_token', data.token);
+      localStorage.setItem('refresh_token', data.refresh);
+      localStorage.setItem('user_id', jwt_decode(data.token).user_id);
+      localStorage.setItem('role', loginType);
 
       setIsLoggedIn(true);
 

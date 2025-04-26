@@ -55,6 +55,12 @@ const Header = () => {
                     </button>
                 )}
 
+                {isLoggedIn && (
+                    <button className="homebutton" onClick={() => localStorage.getItem('role') === "client" ? navigate("/clientfeed") : navigate("/creatorfeed")}>
+                        Dashboard
+                    </button>
+                )}
+
                 <button
                     className="homebutton"
                     onClick={isLoggedIn ? handleLogout : () => navigate("/login")}

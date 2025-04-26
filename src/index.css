@@ -407,7 +407,7 @@ width: 70vw;
 }
 
 .sidebar {
-  background-color: #4b2e83;
+  background-color: rgb(0,0,0);
   color: white;
   width: 220px;
   padding: 2rem 1rem;
@@ -509,7 +509,7 @@ width: 70vw;
 .page-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #4b2e83;
+  color: rgb(0,0,0);
   margin-bottom: 1.5rem;
 }
 
@@ -518,6 +518,10 @@ width: 70vw;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.feed-container h2 {
+  color: black;
 }
 
 .filter-buttons {
