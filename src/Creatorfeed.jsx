@@ -35,7 +35,7 @@ const CreatorFeed = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(quote),
+        body: quote
       });
 
       if (response.ok) {
@@ -83,7 +83,7 @@ const CreatorFeed = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(quote),
+        body: quote,
       });
 
       if (response.ok) {

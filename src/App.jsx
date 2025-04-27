@@ -16,6 +16,7 @@ import ContactUs from './ContactUs'
 import Header from './Header';
 import Footer from './Footer';
 import ClientProfile from './ClientProfile';
+import CreateCatalogue from './CreateCatalogue';
 
 function App() {
   
@@ -39,6 +40,8 @@ function App() {
       <Route path='/catalogManager' element={<CatalogManager/>}></Route>
       <Route path='/creatorReview' element={<ViewCreatorReview/>}></Route>
       <Route path='/client-profile/:id' element={<ClientProfile/>}></Route>
+      <Route path='/create-catalogue' element={<CreateCatalogue/>} />
+      
       </Routes>
       </main>
 
