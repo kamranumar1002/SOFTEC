@@ -97,15 +97,15 @@ const ExploreCreators = () => {
     e.preventDefault();
     try {
       const payload = {
-        creator: selectedCreator._id,
         client: localStorage.getItem("user_id"),
         ...formData
       };
+      console.log(payload)
 
-      const res = await customFetch('http://localhost:5000/api/requests', {
+      const res = await customFetch(`http://localhost:5000/api/requests/${selectedCreator._id}`, {
         headers: {'Content-Type': 'application/json'},
         method: "POST",
-        payload
+        body: payload
       });
       if (res.status === 201) {
         alert("Booking request sent!");
@@ -214,17 +214,23 @@ const ExploreCreators = () => {
                 <p style={{ margin: "0 0 10px", color: "#555", fontSize: "14px" }}>
                   📍 {creator.creatorLocation}
                 </p>
-                {creator.profile_type && <p style={{ margin: "0 0 10px", color: "#555", fontSize: "14px" }}>
-                  🏷️ {creator.profile_type}
+                {creator.budget_range && <p style={{ margin: "0 0 10px", color: "#555", fontSize: "14px" }}>
+                  🏷️ Rs {creator.budget_range}
                 </p>}
                 <p style={{ margin: "0 0 20px", color: "#777", fontSize: "13px" }}>
                   ✉️ {creator.email}
                 </p>
+                <p style={{ margin: "0 0 20px", color: "#777", fontSize: "13px" }}>
+                ⭐ {creator.rating} 
+                </p>
 
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                  <button style={buttonStyle} onClick={() => alert(`Viewing ${creator.fname}'s Profile...`)}>
-                    View Profile
-                  </button>
+                <button
+                  style={buttonStyle}
+                  onClick={() => navigate(`/creator/${creator._id}`)}
+                >
+                  View Profile
+                </button>
                   <button style={buttonStyle} onClick={() => handleOpenModal(creator)}>
                     Book Now
                   </button>

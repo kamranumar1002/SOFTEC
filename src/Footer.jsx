@@ -13,18 +13,13 @@ const Footer = () => {
             style={{
                 backgroundColor: '#ffffff', // white background
                 color: '#000000',
-                display: 'flex',
-                justifyContent: "space-around',",
-                gap: "1rem" ,// black text
-                padding: '1.5rem',
                 borderTop: '1px solid #e0e0e0', // subtle border for separation
                 marginTop: '2rem',
-                margin: '0 auto',
                 
             }}
         >
-            <div className="footer-content" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                <div className="footer-left" style={{ flex: '1', marginBottom: '1rem' }}>
+            <div className="footer-content" style={{ display: 'flex', margin: '0 auto'}}>
+                <div className="footer-left" style={{ flex: '2', marginBottom: '1rem' }}>
                     <h4 style={{ marginBottom: '0.5rem' }}>PixelHire</h4>
                     <p>Connecting you with trusted photographers and videographers nearby.</p>
                     <p>© 2025 PixelHire. All rights reserved.</p>

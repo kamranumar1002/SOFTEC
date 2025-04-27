@@ -6,6 +6,7 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const [signupType, setSignupType] = useState("client");
+  const [cities, setCities] = useState([]);
   const [formData, setFormData] = useState({
     fname: "",
     lname: "",
@@ -18,6 +19,7 @@ const Signup = () => {
     profile_type: "",
     budget_range: "",
     bio: "",
+    city: "",
     profile_img: null,
   });
 
@@ -25,6 +27,26 @@ const Signup = () => {
     if (localStorage.getItem("access_token") !== null) {
       navigate("/");
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const res = await fetch('https://countriesnow.space/api/v0.1/countries/cities', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ country: "Pakistan" }),
+        });
+        const data = await res.json();
+        if (data?.data) {
+          setCities(data.data.sort()); // sort alphabetically
+        }
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+
+    fetchCities();
   }, []);
 
   const handleChange = (e) => {
@@ -41,11 +63,10 @@ const Signup = () => {
     try {
       let profileImgURL = "";
   
-      // 1. If user selected an image, upload it to CDN first
       if (formData.profile_img) {
         const imageFormData = new FormData();
         imageFormData.append("file", formData.profile_img);
-        imageFormData.append("cloud_name", "dp4k97bhg"); // optional depending on CDN
+        imageFormData.append("cloud_name", "dp4k97bhg");
         imageFormData.append("upload_preset", "unsigned");
   
         const imgUploadRes = await fetch("https://api.cloudinary.com/v1_1/dp4k97bhg/image/upload", {
@@ -54,10 +75,10 @@ const Signup = () => {
         });
   
         const imgData = await imgUploadRes.json();
-        profileImgURL = imgData.secure_url; // <-- get CDN URL
+        if (!imgUploadRes.ok) throw new Error(imgData.error?.message || "Image upload failed");
+        profileImgURL = imgData.secure_url;
       }
   
-      // 2. Now prepare final data to send
       const finalPayload = new FormData();
       for (const key in formData) {
         if (key === "profile_img") {
@@ -70,35 +91,36 @@ const Signup = () => {
       }
       finalPayload.append("role", signupType);
   
-      // 3. Debug: see what is being sent
-      for (let [key, value] of finalPayload.entries()) {
-        console.log(key, value);
-      }
-  
-      // 4. Send signup request
       const response = await fetch("http://localhost:5000/api/auth/signup/", {
         method: "POST",
         body: finalPayload,
       });
   
-      if (!response.ok) throw new Error("Signup failed");
+      const result = await response.json(); // <-- very important to read server's reply
+  
+      if (!response.ok) {
+        // Server error: show message if available
+        const errorMsg = result?.error || result?.message || "Signup failed";
+        throw new Error(errorMsg);
+      }
   
       alert("User registered successfully");
       navigate(signupType === "client" ? "/clientfeed" : "/creatorfeed");
   
     } catch (err) {
       console.error("Signup error:", err);
+      alert(`Signup failed: ${err.message}`);
     }
   };
   
-
+  
   return (
-      <div style={{ backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative', padding: 0 , paddingTop : signupType === "creator" ? "50px" : 0}}
-          className="auth-container">
+    <div style={{ backgroundImage: `url(${bg})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', position: 'relative', padding: 0 , paddingTop : signupType === "creator" ? "50px" : 0}}
+      className="auth-container">
     
-          <div className="blurred-overlay"
-            style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backdropFilter: 'blur(3px)', backgroundColor: 'rgba(255, 255, 255, 0.2)', zIndex: 1}}>              
-          </div>
+      <div className="blurred-overlay"
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backdropFilter: 'blur(3px)', backgroundColor: 'rgba(255, 255, 255, 0.2)', zIndex: 1}}>
+      </div>
 
       <div style={{ position: 'relative', zIndex: 2 }} className="auth-box">
         <h2>SIGN UP AS A {signupType.toUpperCase()}</h2>
@@ -111,18 +133,26 @@ const Signup = () => {
           <input name="username" value={formData.username} onChange={handleChange} placeholder="Username" required />
           <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" required />
 
+          {/* City Dropdown */}
+          
+
           {signupType === "creator" && (
             <>
-              <input name="camera_gear_desc" value={formData.camera_gear_desc} onChange={handleChange} placeholder="Camera Gear Description" />
-              <input name="profile_type" value={formData.profile_type} onChange={handleChange} placeholder="Profile Type" />
-              <input name="budget_range" value={formData.budget_range} onChange={handleChange} placeholder="Budget Range" />
+              <input name="camera_gear_desc" value={formData.camera_gear_desc} onChange={handleChange} placeholder="Camera Gear Description" required/>
+              <input name="profile_type" value={formData.profile_type} onChange={handleChange} placeholder="Profile Type" required/>
+              <input name="budget_range" value={formData.budget_range} onChange={handleChange} placeholder="Budget Range (min - max)" required/>
               <div>
                 <label style={{border:"None"}}>Profile Image</label>
-                <input style={{marginTop:"5px"}} name="profile_img" type="file" accept="image/*" onChange={handleChange} />
+                <input style={{marginTop:"5px"}} name="profile_img" type="file" accept="image/*" onChange={handleChange} required/>
               </div>
+              
+              <select name="city" value={formData.city} onChange={handleChange} required>
+                <option value="">Select City</option>
+                {cities.map((city, idx) => (
+                  <option key={idx} value={city}>{city}</option>
+                ))}
+              </select>
               <textarea name="bio" rows="2" value={formData.bio} onChange={handleChange} placeholder="Bio" />
-              
-              
             </>
           )}
 

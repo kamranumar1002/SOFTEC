@@ -71,6 +71,8 @@ const ClientProfile = () => {
   }
 
   return (
+  <div className="client-feed-wrapper">
+      <ClientSidebar />
     <div className="max-w-4xl mx-auto p-6 bg-black min-h-screen text-white">
       {/* Profile Info */}
       <div className="flex flex-col items-center mb-12">
@@ -121,6 +123,7 @@ const ClientProfile = () => {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };

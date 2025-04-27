@@ -23,9 +23,9 @@ const Clientfeed = () => {
  
 
       <main className="client-main">
-        <h1 className="page-title">Client Feed</h1>
+        <h1 style={{textAlign:"center"}} className="page-title">Client Feed</h1>
         <div className="feed-container">
-          <h2>Explore Creators</h2>
+          {/* <h2>Explore Creators</h2> */}
           <ExploreCreators />
         </div>
       </main>

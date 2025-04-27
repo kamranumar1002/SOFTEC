@@ -16,6 +16,8 @@ import ContactUs from './ContactUs'
 import Header from './Header';
 import Footer from './Footer';
 import ClientProfile from './ClientProfile';
+import NewRequest from './NewRequest';
+import ViewQuotes from './ViewQuotes';
 
 function App() {
   
@@ -34,11 +36,13 @@ function App() {
       <Route path='/creatorfeed' element={<CreatorFeed/>}></Route>
       <Route path='/messages' element={<Messages/>}></Route>
       <Route path='/chat/:id' element={<Chat/>}></Route>
-      <Route path='/creatorProfile/:id' element={<CreatorProfile/>}></Route>
+      <Route path="/creator/:creatorId" element={<CreatorProfile />} />
       <Route path='/requests' element={<ViewRequests/>}></Route>
       <Route path='/catalogManager' element={<CatalogManager/>}></Route>
       <Route path='/creatorReview' element={<ViewCreatorReview/>}></Route>
       <Route path='/client-profile/:id' element={<ClientProfile/>}></Route>
+      <Route path='/new-request/' element={<NewRequest/>}></Route>
+      <Route path="/quotes/:requestId" element={<ViewQuotes />} />
       </Routes>
       </main>
 

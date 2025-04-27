@@ -1,173 +1,190 @@
 import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import customFetch from "./interceptors/fetch";
+import ClientSidebar from "./ClientSidebar"; // Import the sidebar component
+import Modal from "react-responsive-modal"; // Install this package: npm install react-responsive-modal
+import "react-responsive-modal/styles.css"; // Import modal styles
+import Catalogue from "./Catalogue";
 
-const CreatorProfile = ({ creatorId }) => {
+const CreatorProfile = () => {
+  const { creatorId } = useParams(); // Get creator ID from URL
   const [creator, setCreator] = useState(null);
-  const [catalogs, setCatalogs] = useState([]);
+  const [catalog, setCatalog] = useState([]);
+  const [filteredCatalog, setFilteredCatalog] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+  const [selectedMedia, setSelectedMedia] = useState(null); // Selected media for preview
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCreatorData = async () => {
       try {
-        const res = await customFetch(`http://localhost:5000/api/creators/${creatorId}`);
-        const data = await res.json();
-        setCreator(data);
-      } catch (error) {
-        console.error("Error fetching creator data:", error);
-      }
-    };
+        const creatorRes = await customFetch(`http://localhost:5000/api/creators/${creatorId}`);
+        if (!creatorRes.ok) throw new Error("Creator not found");
+        const creatorData = await creatorRes.json();
+        setCreator(creatorData);
 
-    const fetchCatalogs = async () => {
-      try {
-        const res = await customFetch(`http://localhost:5000/api/catalogues/creator/${creatorId}`);
-        const data = await res.json();
-        setCatalogs(data);
-      } catch (error) {
-        console.error("Error fetching catalogs:", error);
-      }
-    };
+        const catalogRes = await customFetch(`http://localhost:5000/api/catalogues/creator/${creatorId}`);
+        if (!catalogRes.ok) throw new Error("Error fetching catalog");
+        const catalogData = await catalogRes.json();
+        setCatalog(catalogData);
+        setFilteredCatalog(catalogData);
 
-    const fetchReviews = async () => {
-      try {
-        const res = await customFetch(`http://localhost:5000/api/reviews/${creatorId}`);
-        const data = await res.json();
-        setReviews(data);
+        const categorySet = new Set(catalogData.map((item) => item.category?.name || "Uncategorized"));
+        setCategories(["All", ...Array.from(categorySet)]);
+
+        const reviewsRes = await customFetch(`http://localhost:5000/api/reviews/${creatorId}`);
+        if (!reviewsRes.ok) throw new Error("Error fetching reviews");
+        const reviewsData = await reviewsRes.json();
+        setReviews(reviewsData);
       } catch (error) {
-        console.error("Error fetching reviews:", error);
+        console.error("Error fetching creator profile:", error.message);
+        navigate("/explore"); // Redirect if creator not found
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchCreatorData();
-    fetchCatalogs();
-    fetchReviews();
-  }, [creatorId]);
+  }, [creatorId, navigate]);
 
-  if (!creator) return <p>Loading...</p>;
+  const handleCategoryFilter = (category) => {
+    setSelectedCategory(category);
+    if (category === "All") {
+      setFilteredCatalog(catalog);
+    } else {
+      setFilteredCatalog(catalog.filter((item) => item.category?.name === category));
+    }
+  };
+
+  const handleMediaClick = (media) => {
+    setSelectedMedia(media); // Set the selected media
+    setIsModalOpen(true); // Open the modal
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false); // Close the modal
+    setSelectedMedia(null); // Clear the selected media
+  };
+
+  if (loading) {
+    return (
+      <div style={{ color: "#333", textAlign: "center", marginTop: "50px" }}>
+        Loading...
+      </div>
+    );
+  }
+
+  if (!creator) {
+    return (
+      <div style={{ color: "#333", textAlign: "center", marginTop: "50px" }}>
+        Creator not found.
+      </div>
+    );
+  }
 
   return (
-    <div
-      style={{
-        padding: "20px",
-        maxWidth: "1000px",
-        margin: "0 auto",
-        backgroundColor: "#1e1e2f",
-        color: "#ffffff",
-        borderRadius: "10px",
-        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-      }}
-    >
-      {/* Profile Section */}
-      <div
-        style={{
-          display: "flex",
-          gap: "20px",
-          marginBottom: "30px",
-          alignItems: "center",
-        }}
-      >
-        <img
-          src={creator.profile_img || "https://via.placeholder.com/150"}
-          alt="Creator"
-          style={{
-            width: "150px",
-            height: "150px",
-            borderRadius: "50%",
-            border: "3px solid #a855f7",
-          }}
-        />
-        <div>
-          <h2 style={{ color: "#a855f7", marginBottom: "10px" }}>
-            {creator.fname} {creator.lname}
-          </h2>
-          <p><strong>Email:</strong> {creator.email}</p>
-          <p><strong>Phone:</strong> {creator.phone_no}</p>
-          <p><strong>CNIC:</strong> {creator.cnic}</p>
-          <p><strong>Profile Type:</strong> {creator.profile_type}</p>
-          <p><strong>Budget Range:</strong> {creator.budget_range}</p>
-        </div>
-      </div>
-
-      {/* Bio Section */}
-      <div style={{ marginBottom: "30px" }}>
-        <h3 style={{ color: "#a855f7", marginBottom: "10px" }}>Bio</h3>
-        <p style={{ backgroundColor: "#2e2e3e", padding: "15px", borderRadius: "8px" }}>
-          {creator.bio || "No bio available."}
-        </p>
-      </div>
-
-      {/* Catalog Section */}
-      <div style={{ marginBottom: "30px" }}>
-        <h3 style={{ color: "#a855f7", marginBottom: "10px" }}>Catalog</h3>
-        {catalogs.length === 0 ? (
-          <p>No catalog items available.</p>
-        ) : (
-          <div
+    <div className="client-feed-wrapper">
+      <ClientSidebar />
+      <div style={{ padding: "40px", backgroundColor: "#f9f9f9", minHeight: "100vh", marginLeft: "2vw" }}>
+        {/* Creator Details */}
+        <div style={{ display: "flex", gap: "20px", marginBottom: "40px" }}>
+          <img
+            src={creator.profile_img || "https://via.placeholder.com/150"}
+            alt={`${creator.fname} ${creator.lname}`}
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: "20px",
+              width: "150px",
+              height: "150px",
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "2px solid #eee",
             }}
-          >
-            {catalogs.map((item) => (
-              <div
-                key={item._id}
-                style={{
-                  backgroundColor: "#2e2e3e",
-                  padding: "15px",
-                  borderRadius: "8px",
-                  textAlign: "center",
-                }}
-              >
-                <img
-                  src={item.media[0]?.url || "https://via.placeholder.com/150"}
-                  alt={item.title}
-                  style={{
-                    width: "100%",
-                    height: "150px",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                    marginBottom: "10px",
-                  }}
-                />
-                <h4 style={{ color: "#a855f7", marginBottom: "5px" }}>{item.title}</h4>
-                <p>{item.description}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Reviews Section */}
-      <div>
-        <h3 style={{ color: "#a855f7", marginBottom: "10px" }}>Reviews</h3>
-        {reviews.length === 0 ? (
-          <p>No reviews available.</p>
-        ) : (
+          />
           <div>
+            <h2 style={{ color: "#222", fontSize: "28px", marginBottom: "10px" }}>
+              {creator.fname} {creator.lname}
+            </h2>
+            <p style={{ color: "#555", fontSize: "16px", marginBottom: "10px" }}>
+              📍 {creator.creatorLocation}
+            </p>
+            <p style={{ color: "#555", fontSize: "16px", marginBottom: "10px" }}>
+              ✉️ {creator.email}
+            </p>
+            <p style={{ color: "#555", fontSize: "16px", marginBottom: "10px" }}>
+              ⭐ {creator.rating || "No rating yet"}
+            </p>
+            <p style={{ color: "#777", fontSize: "14px", marginBottom: "10px" }}>
+              {creator.bio || "No bio available."}
+            </p>
+          </div>
+        </div>
+
+        <Catalogue creator={creator} categories={categories} selectedCategory = {selectedCategory} handleCategoryFilter={handleCategoryFilter} filteredCatalog = {filteredCatalog} handleMediaClick={handleMediaClick}/>
+
+        {/* Reviews Section */}
+        <h3 style={{ color: "#222", fontSize: "24px", marginTop: "40px", marginBottom: "20px" }}>
+          Reviews
+        </h3>
+        {reviews.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             {reviews.map((review) => (
               <div
                 key={review._id}
                 style={{
-                  backgroundColor: "#2e2e3e",
-                  padding: "15px",
-                  borderRadius: "8px",
-                  marginBottom: "15px",
-                  border: "1px solid #a855f7",
+                  backgroundColor: "#fff",
+                  border: "1px solid #eee",
+                  borderRadius: "12px",
+                  padding: "20px",
+                  boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
                 }}
               >
-                <p>
-                  <strong>Reviewer:</strong> {review.reviewer?.fname} {review.reviewer?.lname}
+                <h4 style={{ margin: "0 0 10px", color: "#111", fontSize: "18px" }}>
+                  Rating: ⭐ {review.rating}
+                </h4>
+                <p style={{ margin: "0 0 10px", color: "#555", fontSize: "14px" }}>
+                  {review.comment || "No comment provided."}
                 </p>
-                <p>
-                  <strong>Rating:</strong> {review.rating} / 5
-                </p>
-                <p>
-                  <strong>Comment:</strong> {review.comment}
+                <p style={{ margin: "0", color: "#777", fontSize: "13px" }}>
+                  Reviewed by: {review.reviewerType}
                 </p>
               </div>
             ))}
           </div>
+        ) : (
+          <p style={{ color: "#555", fontSize: "16px" }}>
+            No reviews available.
+          </p>
         )}
+
+        {/* Modal for Media Preview */}
+        {/* Modal for Media Preview */}
+        <Modal open={isModalOpen} onClose={closeModal} center>
+          {selectedMedia && selectedMedia.type === "image" ? (
+            <img
+              src={selectedMedia.url}
+              alt="Preview"
+              style={{
+                width: "100%",
+                maxHeight: "80vh",
+                objectFit: "contain",
+              }}
+            />
+          ) : (
+            <video
+              src={selectedMedia?.url}
+              controls
+              autoPlay
+              style={{
+                width: "100%",
+                maxHeight: "80vh",
+                objectFit: "contain",
+              }}
+            />
+          )}
+        </Modal>
       </div>
     </div>
   );
