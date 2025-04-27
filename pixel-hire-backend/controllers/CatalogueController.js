@@ -66,16 +66,6 @@ exports.getCatalogueById = async (req, res) => {
   }
 };
 
-exports.getCataloguesByCategory = async (req, res) => {
-  try {
-    const { categoryId } = req.params;
-    const catalogues = await Catalogue.find({ category: categoryId }).populate('creator');
-    res.json(catalogues);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
 exports.deleteCatalogue = async (req, res) => {
   try {
     const { catalogueId } = req.params;
@@ -89,6 +79,63 @@ exports.deleteCatalogue = async (req, res) => {
 
     await catalogue.remove();
     res.json({ message: 'Catalogue deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+// Add this new method to get all catalogs
+exports.getAllCatalogues = async (req, res) => {
+  try {
+    const catalogues = await Catalogue.find()
+      .populate('creator')
+      .populate('category')
+      .sort({ createdAt: -1 });
+    
+    res.json(catalogues.map(catalog => ({
+      _id: catalog._id,
+      title: catalog.title,
+      description: catalog.description,
+      category: catalog.category.name,
+      creator: {
+        _id: catalog.creator._id,
+        name: `${catalog.creator.fname} ${catalog.creator.lname}`,
+        profile_img: catalog.creator.profile_img
+      },
+      media: catalog.media,
+      createdAt: catalog.createdAt
+    })));
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// Update the existing getCataloguesByCategory method
+exports.getCataloguesByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const catalogues = await Catalogue.find()
+      .populate('creator')
+      .populate({
+        path: 'category',
+        match: { name: category }
+      })
+      .sort({ createdAt: -1 });
+
+    const filteredCatalogues = catalogues.filter(cat => cat.category !== null);
+    
+    res.json(filteredCatalogues.map(catalog => ({
+      _id: catalog._id,
+      title: catalog.title,
+      description: catalog.description,
+      category: catalog.category.name,
+      creator: {
+        _id: catalog.creator._id,
+        name: `${catalog.creator.fname} ${catalog.creator.lname}`,
+        profile_img: catalog.creator.profile_img
+      },
+      media: catalog.media,
+      createdAt: catalog.createdAt
+    })));
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

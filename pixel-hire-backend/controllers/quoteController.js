@@ -10,6 +10,7 @@ exports.sendQuote = async (req, res) => {
       proposed_amount,
       message
     });
+    
 
     await newQuote.save();
     res.status(201).json(newQuote);
