@@ -18,6 +18,7 @@ import Footer from './Footer';
 import ClientProfile from './ClientProfile';
 import NewRequest from './NewRequest';
 import ViewQuotes from './ViewQuotes';
+import CreateCatalogue from './CreateCatalogue';
 
 function App() {
   
@@ -43,6 +44,8 @@ function App() {
       <Route path='/client-profile/:id' element={<ClientProfile/>}></Route>
       <Route path='/new-request/' element={<NewRequest/>}></Route>
       <Route path="/quotes/:requestId" element={<ViewQuotes />} />
+      <Route path='/create-catalogue' element={<CreateCatalogue/>} />
+      
       </Routes>
       </main>
 

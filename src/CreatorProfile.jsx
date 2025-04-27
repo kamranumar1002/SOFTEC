@@ -191,3 +191,89 @@ const CreatorProfile = () => {
 };
 
 export default CreatorProfile;
+
+// Styles
+const wrapperStyle = {
+  padding: "40px",
+  maxWidth: "1000px",
+  margin: "40px auto",
+  backgroundColor: "#f9f9f9",
+  borderRadius: "10px",
+  boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+};
+
+const profileSectionStyle = {
+  display: "flex",
+  gap: "20px",
+  alignItems: "center",
+  marginBottom: "40px",
+};
+
+const profileImgStyle = {
+  width: "150px",
+  height: "150px",
+  objectFit: "cover",
+  borderRadius: "50%",
+  border: "3px solid #a855f7",
+};
+
+const titleStyle = {
+  color: "#a855f7",
+  fontSize: "28px",
+  marginBottom: "10px",
+};
+
+const sectionWrapperStyle = {
+  marginBottom: "50px",
+};
+
+const sectionTitleStyle = {
+  color: "#a855f7",
+  fontSize: "24px",
+  marginBottom: "15px",
+};
+
+const bioStyle = {
+  backgroundColor: "#fff",
+  padding: "15px",
+  borderRadius: "8px",
+  border: "1px solid #ddd",
+  fontSize: "16px",
+  lineHeight: "1.6",
+};
+
+const catalogGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "20px",
+};
+
+const cardStyle = {
+  backgroundColor: "#fff",
+  padding: "15px",
+  borderRadius: "10px",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+  textAlign: "center",
+  transition: "transform 0.3s",
+};
+
+const cardTitleStyle = {
+  color: "#a855f7",
+  margin: "10px 0 5px",
+};
+
+const catalogImgStyle = {
+  width: "100%",
+  height: "150px",
+  objectFit: "cover",
+  borderRadius: "8px",
+  marginBottom: "10px",
+};
+
+const reviewCardStyle = {
+  backgroundColor: "#fff",
+  padding: "20px",
+  borderRadius: "10px",
+  border: "1px solid #a855f7",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
+};
