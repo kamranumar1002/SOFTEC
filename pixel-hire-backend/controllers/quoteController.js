@@ -10,7 +10,7 @@ exports.sendQuote = async (req, res) => {
       proposed_amount,
       message
     });
-    
+
 
     await newQuote.save();
     res.status(201).json(newQuote);
@@ -46,3 +46,18 @@ exports.deleteQuote = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+exports.changeStatus = async (req, res) => {
+  try {
+    const { quoteId, status } = req.body;
+
+    const quote = await Quote.findById(quoteId);
+    if (!quote) return res.status(404).json({ message: 'Quote not found' });
+    
+    quote.quoteStatus = status; 
+    await quote.save(); 
+    res.json({ message: 'Quote status changed successfully' });
+  } catch (err) { 
+    res.status(500).json({ message: err.message });           
+    } 
+  }

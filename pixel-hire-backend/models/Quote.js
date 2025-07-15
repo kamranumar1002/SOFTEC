@@ -5,7 +5,11 @@ const quoteSchema = new mongoose.Schema({
   creator: { type: mongoose.Schema.Types.ObjectId, ref: 'Creator' },
   proposed_amount: Number,
   message: String,
-  isAccepted: { type: Boolean, default: false }
+  quoteStatus: {
+    type: String,
+    enum: ['pending', 'accepted', 'rejected'],
+    default: 'pending',
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Quote', quoteSchema);
