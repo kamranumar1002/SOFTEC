@@ -115,6 +115,12 @@ const CreatorFeed = () => {
         <Link to="/creatorReview">
           <button className="sidebar-btn">Your Reviews</button>
         </Link>
+        <Link to="/viewQuotes">
+          <button className="sidebar-btn">Your Quotes</button>
+        </Link>
+        <Link to="/viewBookings">
+          <button className="sidebar-btn">Your Bookings</button>
+        </Link>
       </aside>
 
       <main className="creator-main">
